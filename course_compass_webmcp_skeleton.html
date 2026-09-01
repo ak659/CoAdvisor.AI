@@ -205,10 +205,7 @@
   </section>
 </main>
 
-<footer>
-  <h2>registerTool() reference — what's wired up on this page</h2>
-  <pre id="codeRef"></pre>
-</footer>
+
 
 <script type="module">
   import { DEGREES, COURSE_INDEX, getPathCourses, getPathCredits } from '/static/catalog.js';
@@ -737,23 +734,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("trackSelect").addEventListener("change", renderCatalogBrowser);
 
 
-  const codeRef = document.getElementById("codeRef");
-  codeRef.textContent =
-`navigator.modelContext.registerTool({
-  name: "add_to_plan",
-  description: "Add a course to the student's current plan.",
-  inputSchema: {
-    type: "object",
-    properties: { course_id: { type: "string" } },
-    required: ["course_id"]
-  },
-  execute: async ({ course_id }) => addToPlan(course_id, "agent")
-});
 
-// + remove_from_plan, check_prerequisites, flag_conflict,
-//   ask_advisor_note, compare_paths — same pattern, registered
-//   once on page load. Each execute() calls the same function
-//   the human-facing buttons call, so state stays single-source.`;
 });
 
 // Expose for demo buttons / console testing
