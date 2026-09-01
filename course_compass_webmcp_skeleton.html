@@ -462,6 +462,7 @@ async function addToPlan(course_id, actor = "agent") {
   if (result.ok) {
    await refreshPlanDisplay();
    await renderCatalogBrowser();
+   await refreshLogDisplay(); 
   }
 
   return result;
@@ -477,6 +478,7 @@ async function removeFromPlan(course_id, actor = "agent") {
 
   if (result.ok) {
     await refreshPlanDisplay();
+    await refreshLogDisplay(); 
   }
 
   return result;
