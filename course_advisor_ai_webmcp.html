@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoAdvisor.AI — WebMCP </title>
+<title>CoAdvisor.AI — WebMCP</title>
 <style>
   :root {
     --ink: #1b2430;
@@ -178,7 +178,7 @@
 
 <header>
   <h1>CoAdvisor.AI</h1>
-  <p>WebMCP tool skeleton — student &amp; agent, shared plan</p>
+  <p>Course planning — student &amp; agent, shared plan</p>
 </header>
 
 <main>
@@ -216,10 +216,12 @@
 </script>
 
 <script>
-// ---------------------------------------------------------------
-// In-memory shared state. In the real app this is backed by your
-// SQLite/Postgres student DB + session log table, keyed by the
-// authenticated user_id from Google/Apple/email login.
+
+  // ---------------------------------------------------------------
+// App state lives in MongoDB (see app.py / db.py), keyed by
+// CURRENT_USER_ID — a per-browser session ID stored in
+// localStorage (no login required). Plans, session log entries,
+// and advisor notes all persist across reloads via the backend.
 // ---------------------------------------------------------------
 
 // session_id instead until real auth is built
@@ -234,61 +236,6 @@ function getOrCreateSessionId() {
 const CURRENT_USER_ID = getOrCreateSessionId();
 
 
-const state = {
-  plan: [],       // { course_id, title, credits }
-  log: [],        // { actor: 'human'|'agent', action, detail, time }
-  notes: [],      // agent-authored advisor notes, kept distinct from human edits
-};
-
-const CATALOG = {
-  "CS101": { title: "Intro to Programming", credits: 4, prereqs: [] },
-  "CS201": { title: "Data Structures", credits: 4, prereqs: ["CS101"] },
-  "STAT101": { title: "Intro Statistics", credits: 3, prereqs: [] },
-  "CS310": { title: "Machine Learning Fundamentals", credits: 4, prereqs: ["CS201", "STAT101"] },
-  "CS320": { title: "Applied Deep Learning", credits: 4, prereqs: ["CS310"] },
-};
-
-function render() {
-  const planEl = document.getElementById("planList");
-  planEl.innerHTML = "";
-  if (state.notes.length === 0 && state.plan.length === 0) {
-    planEl.innerHTML = '<div class="empty">No courses added yet. Try the demo buttons below, or let an agent call add_to_plan().</div>';
-  }
-  state.notes.forEach(n => {
-    const div = document.createElement("div");
-    div.className = "advisor-note";
-    div.innerHTML = `<span class="tag">Agent note · ${n.course_id}</span>${n.text}`;
-    planEl.appendChild(div);
-  });
-  state.plan.forEach(c => {
-    const div = document.createElement("div");
-    div.className = "plan-card";
-    div.innerHTML = `
-      <div>
-        <strong>${c.course_id}</strong> — ${c.title}
-        <div class="meta">${c.credits} credits · added by ${c.addedBy}</div>
-      </div>
-      <button onclick="removeFromPlan('${c.course_id}', 'human')">Remove</button>
-    `;
-    planEl.appendChild(div);
-  });
-
-  const logEl = document.getElementById("logList");
-  logEl.innerHTML = "";
-  if (state.log.length === 0) {
-    logEl.innerHTML = '<div class="empty">No activity yet.</div>';
-  }
-  [...state.log].reverse().forEach(entry => {
-    const div = document.createElement("div");
-    div.className = "log-entry";
-    div.innerHTML = `
-      <span class="actor ${entry.actor}">${entry.actor}</span>
-      <span class="txt">${entry.detail}</span>
-      <span class="time">${entry.time}</span>
-    `;
-    logEl.appendChild(div);
-  });
-}
 
 async function refreshPlanDisplay() {
   const data = await fetch(`/api/plan/${CURRENT_USER_ID}`).then(r => r.json());
@@ -611,7 +558,7 @@ function registerWebMCPTools() {
   const modelContext = document.modelContext || navigator.modelContext;
 
   if (!modelContext) {
-    document.getElementById("status").textContent = "WebMCP not detected in this browser — demo buttons below still work.";
+    document.getElementById("status").textContent = "WebMCP not detected in this browser — you can still browse and add courses manually below.";
     document.getElementById("status").className = "status off";
     return;
   }
@@ -715,9 +662,12 @@ function registerWebMCPTools() {
 });
 }
 
-// Demo buttons stand in for a real course-browsing UI — wire the
-// same functions a human would trigger by clicking.
-// plus dropdown functionality
+// Wires up the catalog browser (degree/track dropdowns + course
+// list) and initial data load. The same functions here are called
+// either by a human clicking, or by an agent via a registered
+// WebMCP tool — see registerWebMCPTools() above.
+
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOMContentLoaded fired")
   registerWebMCPTools();
@@ -737,14 +687,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// Expose for demo buttons / console testing
+// Expose for console testing
 window.addToPlan = addToPlan;
 window.removeFromPlan = removeFromPlan;
 window.checkPrerequisites = checkPrerequisites;
 window.flagConflict = flagConflict;
 window.askAdvisorNote = askAdvisorNote;
 window.comparePaths = comparePaths;
-
+window.checkFeasibility = checkFeasibility;
 
 
 </script>

@@ -4,7 +4,7 @@ app.py
 FastAPI backend for Course Compass.
 
 Serves:
-  - The frontend HTML (course_compass_webmcp_skeleton.html)
+  - The frontend HTML (course_advisor_ai_webmcp.html)
   - REST endpoints backing the six WebMCP tools, persisted to
     MongoDB (see db.py)
 
@@ -157,10 +157,10 @@ def get_student(student_id: str):
 # Serve the frontend
 # ------------------------------------------------------------------
 
-FRONTEND_PATH = Path(__file__).parent / "course_compass_webmcp_skeleton.html"
+FRONTEND_PATH = Path(__file__).parent / "course_advisor_ai_webmcp.html"
 
 @app.get("/")
 def serve_frontend():
     if FRONTEND_PATH.exists():
         return FileResponse(FRONTEND_PATH)
-    return {"detail": "Frontend HTML not found next to app.py — copy course_compass_webmcp_skeleton.html here."}
+    return {"detail": "Frontend HTML not found next to app.py — copy course_advisor_ai_webmcp.html here."}

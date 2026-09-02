@@ -35,7 +35,7 @@ from pymongo import MongoClient
 fake = Faker()
 random.seed(42)  # reproducible while iterating; remove/change seed for fresh runs
 
-DATA_DIR = Path(__file__).parent
+DATA_DIR = Path(__file__).parent / "student_data"
 MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("MONGODB_DB_NAME", "course_compass")
 
