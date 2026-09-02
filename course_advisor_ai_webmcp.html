@@ -404,9 +404,11 @@ async function addToPlan(course_id, actor = "agent") {
   const result = await response.json();
 
   if (result.ok) {
-   await refreshPlanDisplay();
-   await renderCatalogBrowser();
-   await refreshLogDisplay(); 
+   await Promise.all([
+    await refreshPlanDisplay(),
+    await renderCatalogBrowser(),
+    await refreshLogDisplay(),
+  ]);
   }
 
   return result;
@@ -421,8 +423,10 @@ async function removeFromPlan(course_id, actor = "agent") {
   const result = await response.json();
 
   if (result.ok) {
-    await refreshPlanDisplay();
-    await refreshLogDisplay(); 
+   await Promise.all([
+    await refreshPlanDisplay(),
+    await refreshLogDisplay(),
+  ]);
   }
 
   return result;
