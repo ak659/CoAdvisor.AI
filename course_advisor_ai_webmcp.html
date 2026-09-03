@@ -408,9 +408,9 @@ async function addToPlan(course_id, actor = "agent") {
 
   if (result.ok) {
    await Promise.all([
-    await refreshPlanDisplay(),
-    await renderCatalogBrowser(),
-    await refreshLogDisplay(),
+    refreshPlanDisplay(),
+    renderCatalogBrowser(),
+    refreshLogDisplay(),
   ]);
   }
 
@@ -427,8 +427,9 @@ async function removeFromPlan(course_id, actor = "agent") {
 
   if (result.ok) {
    await Promise.all([
-    await refreshPlanDisplay(),
-    await refreshLogDisplay(),
+    refreshPlanDisplay(),
+    refreshLogDisplay(),
+    renderCatalogBrowser()
   ]);
   }
 
@@ -573,6 +574,7 @@ function registerWebMCPTools() {
   document.getElementById("status").textContent = "WebMCP detected — tools registered, agent can act on this page.";
   document.getElementById("status").className = "status ok";
 
+  //add_to_plan
   modelContext.registerTool({
     name: "add_to_plan",
     description: "Add a course to the student's current plan by its course_id.",
@@ -585,7 +587,8 @@ function registerWebMCPTools() {
     },
     execute: async ({ course_id }) => addToPlan(course_id, "agent")
   });
-
+ 
+  //remove_from_plan
   modelContext.registerTool({
     name: "remove_from_plan",
     description: "Remove a course from the student's current plan by its course_id.",
@@ -596,7 +599,9 @@ function registerWebMCPTools() {
     },
     execute: async ({ course_id }) => removeFromPlan(course_id, "agent")
   });
+  
 
+  //check_prerequisites
   modelContext.registerTool({
     name: "check_prerequisites",
     description: "Check whether the prerequisites for a course are satisfied by the student's current plan.",
@@ -607,7 +612,8 @@ function registerWebMCPTools() {
     },
     execute: async ({ course_id }) => checkPrerequisites(course_id)
   });
-
+  
+  //flag_conflict
   modelContext.registerTool({
     name: "flag_conflict",
     description: "Flag a conflict between two courses (e.g. schedule overlap or prerequisite issue), visible to the student as an agent-authored note.",
@@ -622,7 +628,8 @@ function registerWebMCPTools() {
     },
     execute: async ({ course_id_a, course_id_b, reason }) => flagConflict(course_id_a, course_id_b, reason)
   });
-
+  
+  //check_feasibility
   modelContext.registerTool({
   name: "check_feasibility",
   description: "Check whether a student can feasibly complete a given degree/track path based on their current transcript, identifying any courses whose prerequisites aren't yet satisfied.",
@@ -637,7 +644,8 @@ function registerWebMCPTools() {
   },
   execute: async ({ student_id, degree, track }) => checkFeasibility(student_id, degree, track)
 });
-
+  
+//ask_advisor_note
   modelContext.registerTool({
     name: "ask_advisor_note",
     description: "Leave an advisor-style note on a specific course, visible in the plan under the agent's own identity.",
@@ -652,6 +660,7 @@ function registerWebMCPTools() {
     execute: async ({ course_id, text }) => askAdvisorNote(course_id, text)
   });
 
+  //compare_paths
  modelContext.registerTool({
   name: "compare_paths",
   description: "Compare two degree/track paths by total credits and course composition. Omit track to compare only core curriculum.",
