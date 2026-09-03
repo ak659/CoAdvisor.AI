@@ -358,7 +358,6 @@ async function renderCatalogBrowser() {
   const degreeName = document.getElementById("degreeSelect").value;
   const trackName = document.getElementById("trackSelect").value;
   const catalogEl = document.getElementById("catalogList");
-  catalogEl.innerHTML = "";
 
   if (!degreeName) {
     catalogEl.innerHTML = '<div class="empty">Select a degree above to browse courses.</div>';
@@ -366,27 +365,29 @@ async function renderCatalogBrowser() {
   }
 
   const courseIds = getPathCourses(degreeName, trackName || null);
-
-  // check what's already in the plan, so we can disable duplicate adds
   const planData = await fetch(`/api/plan/${CURRENT_USER_ID}`).then(r => r.json());
   const inPlan = new Set(planData.plan.map(item => item.course_id));
 
+  // Build the new HTML as a string first — no DOM changes yet
+  let newHtml = "";
   courseIds.forEach(courseId => {
     const course = COURSE_INDEX[courseId];
-    const div = document.createElement("div");
-    div.className = "plan-card";
     const alreadyAdded = inPlan.has(courseId);
-    div.innerHTML = `
-      <div>
-        <strong>${course.id}</strong> — ${course.title}
-        <div class="meta">${course.credits} credits · ${course.level}${course.track ? " · " + course.track : ""}</div>
+    newHtml += `
+      <div class="plan-card">
+        <div>
+          <strong>${course.id}</strong> — ${course.title}
+          <div class="meta">${course.credits} credits · ${course.level}${course.track ? " · " + course.track : ""}</div>
+        </div>
+        <button ${alreadyAdded ? "disabled" : ""} onclick="addToPlan('${course.id}', 'human')">
+          ${alreadyAdded ? "In plan" : "Add to Plan"}
+        </button>
       </div>
-      <button ${alreadyAdded ? "disabled" : ""} onclick="addToPlan('${course.id}', 'human')">
-        ${alreadyAdded ? "In plan" : "Add to Plan"}
-      </button>
     `;
-    catalogEl.appendChild(div);
   });
+
+  // Swap it in all at once, after the fetch resolved
+  catalogEl.innerHTML = newHtml;
 }
 // end drop down functions
 
