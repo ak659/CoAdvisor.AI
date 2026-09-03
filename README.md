@@ -5,7 +5,7 @@ An agentic course-planning app for a virtual college, built for the **OpenAI Web
 CoAdvisor.AI lets a student and an AI agent work on the **same live plan together** — both can browse courses, add/remove them, check prerequisites, compare degree paths, and flag conflicts. Every action, whether taken by a human or an agent, is persisted to the same database and visibly attributed, so either party can pick up exactly where the other left off.
 
 **Live app:** https://coadvisor-ai.onrender.com
-**Demo video:** _[add link once uploaded]_
+**Demo video:** https://youtu.be/dBIR9_6RSYY
 
 ---
 
